@@ -1,52 +1,63 @@
-# April Fallen
+# April image assets
 
-Fallen Survival script for [Project Vector](https://project-vector-1.gitbook.io/vector-lua-engine/).
+PNG files hosted on GitHub for `draw.load_image` (Vector requires **HTTPS** URLs — see `docs/API.md`).
 
-## Load in Vector
+## Workflow
 
-Paste this into a Vector script slot and execute:
+1. **Extract** asset IDs from the game dump:
+   ```bash
+   npm run extract-images
+   ```
+   Generates `src/game/item_images.lua` and `assets/manifest.json`.
 
-```lua
-utility.LoadUrl("https://raw.githubusercontent.com/Cunzaki/April/refs/heads/main/april.lua")
-```
+2. **Download** PNGs from Roblox Thumbnails API:
+   ```bash
+   npm run download-assets
+   ```
+   Writes `assets/items/{assetId}.png` and `assets/tung.png`.
 
-That always pulls the latest full `april.lua` runtime from GitHub `main` (one file — no split chunks).
+3. **Commit & push** `assets/` to GitHub (`main` branch).
 
-Menu: **INSERT** (custom UI)
+4. **Rebuild** the script:
+   ```bash
+   npm run build
+   ```
 
----
+Runtime URLs: `https://raw.githubusercontent.com/Cunzaki/April/refs/heads/main/assets/items/{id}.png`
 
-## Rebuild & ship
+Do **not** use `github.com/.../blob/main/...` — that is the web viewer, not a direct image URL.
+
+## Brainrot ESP
+
+Transparent brainrot character PNGs → `assets/brainrot/{name}.png`
 
 ```bash
-npm run build
-git add april.lua load.lua "Script 1.lua" src scripts
-git commit -m "Ship April vX.Y.Z"
-git push origin main
+node scripts/download-brainrot.mjs
 ```
 
-After push, `utility.LoadUrl(...)` serves the new build.
+Runtime URL: `https://raw.githubusercontent.com/Cunzaki/April/refs/heads/main/assets/brainrot/tung_tung_sahur.png`
 
----
+## Anime announcer
 
-## Repo layout
+Waist-up transparent announcer expressions live under `assets/anime/{character}/`.
+The runtime fetches both PNG expressions and `dialogue.txt` from GitHub over HTTPS.
 
-| Path | Purpose |
-|------|---------|
-| `src/` | Modular source — **edit here** |
-| `docs/ARCHITECTURE.md` | How boot, frame loop, menu, and features fit together |
-| `docs/API.md` | Vector Lua API |
-| `april.lua` | Generated remote runtime |
-| `Script 1.lua` | Identical local test copy of the runtime |
-| `load.lua` | Same one-line LoadUrl shown above |
-| `scripts/` | Bundle, dump, and asset tools |
-| `src/ui/catalog_*.lua` | Per-tab custom-menu layouts |
-| `src/ui/template/` | Standalone UI kit (no game features) |
+Runtime URL: `https://cdn.jsdelivr.net/gh/Cunzaki/April@<release>/assets/anime/april/normal.png`
 
-**Local only (gitignored):** `dump/`, `RE/`, `node_modules/`
+Each character folder includes its source/license note. Hiyori is licensed for use
+and modification inside games, but must not be redistributed as a standalone asset
+pack. The in-app announcer is named April.
 
----
+## Tung ESP
 
-## License
+Decal asset [139818999438291](https://create.roblox.com/store/asset/139818999438291/tung-tung-tung-sahur) → `assets/tung.png`
 
-Use at your own risk. Not affiliated with Project Vector or Fallen Survival.
+## Mod Checker
+
+Shield warning icon for in-world mod markers → `assets/mod_warning.png`
+
+Runtime URL: `https://raw.githubusercontent.com/Cunzaki/April/refs/heads/main/assets/mod_warning.png`
+
+## After game updates
+
+Re-dump Items module → re-run `npm run assets` → commit new/changed PNGs.
